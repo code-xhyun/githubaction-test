@@ -8,16 +8,16 @@ on:
 jobs:
   checkLabel:
     runs-on: ubuntu-latest
-      - name: Check PR labels action step
-        id: check_pr_labels
-        uses: shioyang/check-pr-labels-on-push-action@v1.0.3
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          labels: '["test"]'
-      - name: See result
-          run: echo "${{ steps.check_pr_labels.outputs.result }}"
-
-  # This workflow contains a single job called "build"
+      steps:
+        - name: Check PR labels action step
+          id: check_pr_labels
+          uses: shioyang/check-pr-labels-on-push-action@v1.0.3
+          with:
+            github-token: ${{ secrets.GITHUB_TOKEN }}
+            labels: '["test"]'
+        - name: See result
+            run: echo "${{ steps.check_pr_labels.outputs.result }}"
+  
   build:
     if: ${{ steps.check_pr_labels.outputs.result == 'true' }}
     # The type of runner that the job will run on
