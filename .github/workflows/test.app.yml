@@ -4,10 +4,6 @@ on:
   push:
     branches:
       - master
-    types:
-      - reopened
-      - opened
-      - labeled
 
 jobs:
   # This workflow contains a single job called "build"
