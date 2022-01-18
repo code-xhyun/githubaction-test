@@ -16,9 +16,9 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           labels: '["test"]'
       - name: See result
-        run: echo" ${{ steps.check_pr_labels.outputs.result}}"
+        run: echo "${{ steps.check_pr_labels.outputs.result}}"
       - name: result
-        if: ${{ steps.check_pr_labels.outputs.result  == 'fail' }}
+        if: ${{ steps.check_pr_labels.outputs.result  == 'false' }}
         run: exit 1
 
   build:
