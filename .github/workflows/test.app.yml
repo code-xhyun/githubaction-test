@@ -3,7 +3,7 @@ name: Deploy to Production
 on:
   push:
     branches:
-      - "master"
+      - master
     types:
       - reopened
       - opened
@@ -17,6 +17,12 @@ jobs:
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
+      - name: Check PR labels action step
+        id: check_pr_labels
+        uses: shioyang/check-pr-labels-on-push-action@v1.0.3
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          labels: '["test"]'
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
 
