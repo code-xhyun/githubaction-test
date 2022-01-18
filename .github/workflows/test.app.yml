@@ -7,6 +7,8 @@ on:
 
 jobs:
   check:
+    outputs:
+    status: ${{ steps.early.conclusion }}
     runs-on: ubuntu-latest
     steps:
       - name: Check PR labels action step
@@ -16,9 +18,9 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           labels: '["test"]'
       - name: See result
-        run: echo "${{ steps.check_pr_labels.outputs.result}}"
+        run: echo" ${{ steps.check_pr_labels.outputs.result}}"
       - name: result
-        if: ${{ steps.check_pr_labels.outputs.result  == 'false' }}
+        if: ${{ steps.check_pr_labels.outputs.result  == 'fail' }}
         run: exit 1
 
   build:
