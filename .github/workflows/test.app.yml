@@ -8,7 +8,7 @@ on:
 jobs:
   check:
     outputs:
-      status: ${{ steps.early.conclusion }}
+      status: ${{ steps.check_pr_labels.outputs.result }}
     runs-on: ubuntu-latest
     steps:
       - name: Check PR labels action step
@@ -19,9 +19,9 @@ jobs:
           labels: '["test"]'
       - name: See result
         run: echo "${{ steps.check_pr_labels.outputs.result}}"
-      - name: result
-        if: ${{ steps.check_pr_labels.outputs.result  == 'false' }}
-        run: exit 1
+      # - name: result
+      #   if: ${{ steps.check_pr_labels.outputs.result  == 'false' }}
+      #   run: exit 1
 
   build:
     needs: check
