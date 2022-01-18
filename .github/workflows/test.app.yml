@@ -19,6 +19,8 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           labels: '["test"]'
+      - name: See result
+        run: echo "${{ steps.check_pr_labels.outputs.result }}"
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
 
