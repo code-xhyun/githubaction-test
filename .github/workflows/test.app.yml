@@ -6,7 +6,7 @@ on:
       - master
 
 jobs:
-  checkLabel:
+  check:
     runs-on: ubuntu-latest
     steps:
       - name: Check PR labels action step
@@ -16,11 +16,12 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           labels: '["test"]'
       - name: See result
-          run: echo "${{ steps.check_pr_labels.outputs.result }}"
+          if: ${{ steps.check_pr_labels.outputs.result  == 'fail' }}
+          run: exit 1
   
   build:
     needs: checkLabel
-    if: ${{ steps.check_pr_labels.outputs.result == 'true' }}
+    if: needs.check.outputs.status == 'success'
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
