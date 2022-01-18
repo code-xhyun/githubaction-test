@@ -8,7 +8,7 @@ on:
 jobs:
   check:
     outputs:
-    status: ${{ steps.early.conclusion }}
+      status: ${{ steps.early.conclusion }}
     runs-on: ubuntu-latest
     steps:
       - name: Check PR labels action step
