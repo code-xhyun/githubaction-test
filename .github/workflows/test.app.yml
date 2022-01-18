@@ -16,9 +16,9 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           labels: '["test"]'
       - name: See result
-          if: ${{ steps.check_pr_labels.outputs.result  == 'fail' }}
-          run: exit 1
-  
+        if: ${{ steps.check_pr_labels.outputs.result  == 'fail' }}
+        run: exit 1
+
   build:
     needs: checkLabel
     if: needs.check.outputs.status == 'success'
