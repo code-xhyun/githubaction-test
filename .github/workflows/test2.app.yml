@@ -41,7 +41,7 @@ jobs:
       - name: backend - Create .env file
         run: |
           touch .env.prod
-          echo {{secrets.PROD_BACKEND_ENV}} >> .env.prod
+          echo ${{secrets.PROD_BACKEND_ENV}} >> .env.prod
           cat .env.prod
 
       - name: backend - npm install
