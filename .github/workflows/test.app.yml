@@ -1,15 +1,16 @@
-name: Deploy to Production
+name: "Build"
 
 on:
   push:
     branches:
-      - master
+      - "master"
 
 jobs:
   check:
     outputs:
       status: ${{ steps.check_pr_labels.outputs.result }}
     runs-on: ubuntu-latest
+
     steps:
       - name: Check PR labels action step
         id: check_pr_labels
@@ -19,26 +20,61 @@ jobs:
           labels: '["test"]'
       - name: See result
         run: echo "${{ steps.check_pr_labels.outputs.result}}"
-        # - name: result
-        #   if: ${{ steps.check_pr_labels.outputs.result  == 'false' }}
-        #   run: exit 1
 
-  build:
+  deploy:
     needs: check
     if: needs.check.outputs.status == 'true'
-    # The type of runner that the job will run on
-    runs-on: ubuntu-latest
-    # Steps represent a sequence of tasks that will be executed as part of the job
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
-
-      # Runs a single command using the runners shell
-      - name: Run a one-line script
-        run: echo "${{needs.check.outputs.status}}"
-
-      # Runs a set of commands using the runners shell
-      - name: Run a multi-line script
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 1
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: backend - Create .env file
         run: |
-          echo Add other actions to build,
-          echo test, and deploy your project.
+          cd ./backend
+          touch .env.prod
+          echo {{secrets.PROD_BACKEND_ENV}} >> .env.prod
+          cat .env.prod
+      - name: backend - npm install
+        run: cd ./backend && npm install
+      - name: backend - Generate deployment package
+        run: cd ./backend && npm run server-build
+      - name: backend - package-version
+        run: node -p -e '`PACKAGE_VERSION=${require("./backend/package.json").version}`' >> $GITHUB_ENV
+      - name: Add SHORT_SHA env property with commit short sha
+        run: echo "SHORT_SHA=`echo ${GITHUB_SHA} | cut -c1-8`" >> $GITHUB_ENV
+        uses: einaregilsson/beanstalk-deploy@v9
+        env:
+          SHA4: ${{ steps.vars.outputs.sha4 }}
+        with:
+          aws_access_key: ${{ secrets.AWS_EB_ACCESS_KEY_ID }}
+          aws_secret_key: ${{ secrets.AWS_EB_SECRET_ACCESS_KEY }}
+          application_name: seeso-admin
+          environment_name: seesoadminproduction-env
+          version_label: ${{ env.PACKAGE_VERSION }}-${{env.SHORT_SHA}}
+          region: ap-northeast-2
+          deployment_package: ./backend/dist.zip
+      - name: package-version-to-git-tag
+        uses: pkgdeps/git-tag-action@v2
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          github_repo: ${{ github.repository }}
+          version: ${{ env.PACKAGE_VERSION }}
+          git_commit_sha: ${{ github.sha }}
+          git_tag_prefix: "v"
+      - name: Release Drafter
+        id: release_drafter
+        uses: release-drafter/release-drafter@v5
+        with:
+          config-name: release-drafter.yml
+          version: ${{ env.PACKAGE_VERSION }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
