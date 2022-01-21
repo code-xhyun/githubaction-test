@@ -10,7 +10,6 @@ jobs:
     outputs:
       status: ${{ steps.check_pr_labels.outputs.result }}
     runs-on: ubuntu-latest
-
     steps:
       - name: Check PR labels action step
         id: check_pr_labels
