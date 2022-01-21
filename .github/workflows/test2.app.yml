@@ -40,7 +40,6 @@ jobs:
 
       - name: backend - Create .env file
         run: |
-          cd ./backend
           touch .env.prod
           echo {{secrets.PROD_BACKEND_ENV}} >> .env.prod
           cat .env.prod
@@ -56,7 +55,7 @@ jobs:
 
       - name: Add SHORT_SHA env property with commit short sha
         run: echo "SHORT_SHA=`echo ${GITHUB_SHA} | cut -c1-8`" >> $GITHUB_ENV
-        
+
       - name: backend - Deploy to EB
         uses: einaregilsson/beanstalk-deploy@v9
         env:
