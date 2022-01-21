@@ -21,13 +21,13 @@ jobs:
       - name: See result
         run: echo "${{ steps.check_pr_labels.outputs.result}}"
 
-  # deploy:
+  deploy:
     needs: check
     if: needs.check.outputs.status == 'true'
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
     strategy:
       matrix:
-        os: [ubuntu-latest]
+        node-version: [${{ matrix.node-version }}]
     steps:
       - name: Checkout
         uses: actions/checkout@v2
